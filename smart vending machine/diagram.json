@@ -1,0 +1,62 @@
+{
+    "version": 1,
+    "editor": "wokwi",
+    "parts": [
+        {
+            "type": "board-esp32-devkit-v1",
+            "id": "esp1",
+            "top": 260,
+            "left": 10,
+            "attrs": {}
+        },
+        {
+            "type": "wokwi-ili9341",
+            "id": "tft1",
+            "top": 60,
+            "left": 160,
+            "attrs": {}
+        },
+        {
+            "type": "wokwi-led",
+            "id": "led1",
+            "top": 360,
+            "left": 110,
+            "attrs": {}
+        }
+    ],
+    "connections": [
+        [
+            "esp1:GND.1",
+            "tft1:GND",
+            "black",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "esp1:3V3",
+            "tft1:VCC",
+            "red",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "esp1:D18",
+            "led1:A",
+            "green",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "led1:C",
+            "esp1:GND.2",
+            "black",
+            [
+                "v0"
+            ]
+        ]
+    ],
+    "dependencies": {}
+}
