@@ -40,16 +40,31 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 void setup()
 {
   Serial.begin(115200);
-  pinMode(MOTOR_PIN, OUTPUT);
+  delay(1000); // Give the simulator a second to stabilize
 
-  Serial.print("Connecting to WiFi");
+  Serial.println("\nInitializing WiFi...");
+  WiFi.mode(WIFI_STA); // Explicitly set Station Mode
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
+
+  int attempt = 0;
+  while (WiFi.status() != WL_CONNECTED && attempt < 20)
   {
     delay(500);
     Serial.print(".");
+    attempt++;
   }
-  Serial.println("\nWiFi Connected!");
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.println("\nWiFi Connected!");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+  }
+  else
+  {
+    Serial.println("\nWiFi Connection Failed! Check SSID.");
+
+  } // ... rest of your websocket setup ...
 
   // Connect to Python WebSocket Server
   // Ensure your Python server is running and listening on 0.0.0.0:8000
