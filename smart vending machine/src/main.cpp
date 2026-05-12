@@ -3,28 +3,37 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 
-const char *ssid = "YOUR_WIFI_NAME";
-const char *password = "YOUR_WIFI_PASSWORD";
-const char *server_ip = "192.168.1.100"; // Your Python Server IP
+// Wokwi specific credentials
+const char *ssid = "Wokwi-GUEST";
+const char *password = "";
+const char *server_ip = "192.168.1.167";
 
 WebSocketsClient webSocket;
-const int MOTOR_PIN = 18; // Pin connected to Relay/Driver
+const int MOTOR_PIN = 18;
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
-  if (type == WStype_TEXT)
+  switch (type)
   {
+  case WStype_DISCONNECTED:
+    Serial.println("[WS] Disconnected!");
+    break;
+  case WStype_CONNECTED:
+    Serial.println("[WS] Connected to server!");
+    break;
+  case WStype_TEXT:
     StaticJsonDocument<200> doc;
     deserializeJson(doc, payload);
 
     const char *action = doc["action"];
-    if (strcmp(action, "dispense") == 0)
+    if (action && strcmp(action, "dispense") == 0)
     {
       Serial.println("Payment Confirmed! Dispensing...");
       digitalWrite(MOTOR_PIN, HIGH);
-      delay(2000); // Turn motor for 2 seconds
+      delay(2000);
       digitalWrite(MOTOR_PIN, LOW);
     }
+    break;
   }
 }
 
@@ -33,11 +42,17 @@ void setup()
   Serial.begin(115200);
   pinMode(MOTOR_PIN, OUTPUT);
 
+  Serial.print("Connecting to WiFi");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi Connected!");
 
-  // Connect to Python WebSocket Server on port 8000
+  // Connect to Python WebSocket Server
+  // Ensure your Python server is running and listening on 0.0.0.0:8000
   webSocket.begin(server_ip, 8000, "/ws/vending01");
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(5000);
